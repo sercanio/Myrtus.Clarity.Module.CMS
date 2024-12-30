@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myrtus.Clarity.Module.CMS.WebAPI", "src\Myrtus.Clarity.Module.CMS.WebAPI\Myrtus.Clarity.Module.CMS.WebAPI.csproj", "{1E0D48B5-8567-4899-BFCF-27F340D54664}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{D136A7DD-14ED-421C-9C94-0F40BE4A76A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myrtus.Clarity.Core.Application.Abstractions.Auditing", "core\Myrtus.Clarity.Core.Application.Abstractions.Auditing\Myrtus.Clarity.Core.Application.Abstractions.Auditing.csproj", "{9C0B74C9-1038-4479-A547-4D7E7D3799BF}"
@@ -65,16 +63,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myrtus.Clarity.Core.Applica
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{641E4C72-F543-4460-8EF9-416A109E3F6D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EDAF332F-EF24-44D6-88F7-7CD9D7D48BDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1E0D48B5-8567-4899-BFCF-27F340D54664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1E0D48B5-8567-4899-BFCF-27F340D54664}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1E0D48B5-8567-4899-BFCF-27F340D54664}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1E0D48B5-8567-4899-BFCF-27F340D54664}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9C0B74C9-1038-4479-A547-4D7E7D3799BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9C0B74C9-1038-4479-A547-4D7E7D3799BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C0B74C9-1038-4479-A547-4D7E7D3799BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -192,7 +188,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1E0D48B5-8567-4899-BFCF-27F340D54664} = {641E4C72-F543-4460-8EF9-416A109E3F6D}
 		{9C0B74C9-1038-4479-A547-4D7E7D3799BF} = {D136A7DD-14ED-421C-9C94-0F40BE4A76A1}
 		{C4EDA4C4-039D-49FF-A33D-BF0B089BE5B4} = {D136A7DD-14ED-421C-9C94-0F40BE4A76A1}
 		{8B1A3BC7-8F3A-46A9-B762-9054DF843E28} = {D136A7DD-14ED-421C-9C94-0F40BE4A76A1}
