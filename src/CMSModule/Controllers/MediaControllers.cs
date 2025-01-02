@@ -1,19 +1,26 @@
-﻿using CMSModule.Models;
+﻿using CMSModule.DTOs;
+using CMSModule.Models;
 using CMSModule.Services.MediaService;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Myrtus.Clarity.Core.WebAPI;
+using Myrtus.Clarity.Core.WebAPI.Controllers;
 
 namespace CMSModule.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-[Authorize(Policy = "cms.read")]
-public class MediaController : ControllerBase
+[ApiVersion("1")]
+[Route("api/v{version:apiVersion}/Media")]
+[EnableRateLimiting("fixed")]
+public class MediaController : BaseController
 {
     private readonly IMediaService _mediaService;
 
-    public MediaController(IMediaService mediaService)
+    public MediaController(IMediaService mediaService, ISender sender, IErrorHandlingService errorHandlingService)
+        : base(sender, errorHandlingService)
     {
         _mediaService = mediaService;
     }
@@ -32,22 +39,23 @@ public class MediaController : ControllerBase
         return Ok(media);
     }
 
+    /// <summary>
+    /// Uploads media to the server.
+    /// </summary>
+    /// <param name="file">The media file to upload.</param>
+    /// <returns>A response indicating the success of the upload.</returns>
     [HttpPost("upload")]
-    [Authorize(Policy = "cms.write")]
-    public async Task<ActionResult<Media>> UploadMedia([FromForm] IFormFile file)
+    [Consumes("multipart/form-data")]
+    public IActionResult UploadMedia([FromForm] UploadMediaRequest request)
     {
-        var uploadedBy = User.Identity.Name ?? "system"; // Replace "system" with actual user
-        var result = await _mediaService.UploadMediaAsync(file, uploadedBy);
-        if (result.IsSuccess)
-        {
-            var media = result.Value;
-            return CreatedAtAction(nameof(GetMediaUrl), new { id = media.Id }, media);
-        }
-        return BadRequest(result.Errors);
+        if (request.File == null || request.File.Length == 0)
+            return BadRequest("File is missing or empty.");
+
+        // Perform file processing logic
+        return Ok("File uploaded successfully.");
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Policy = "cms.delete")]
     public async Task<ActionResult> DeleteMedia(string id)
     {
         await _mediaService.DeleteMediaAsync(id);

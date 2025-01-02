@@ -2,19 +2,25 @@
 using CMSModule.DTOs;
 using CMSModule.Models;
 using CMSModule.Services.ContentService;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Myrtus.Clarity.Core.WebAPI;
+using Myrtus.Clarity.Core.WebAPI.Controllers;
 
 namespace CMSModule.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    [Authorize(Policy = "cms.read")]
-    public class CMSController : ControllerBase
+    [ApiVersion("1")]
+    [Route("api/v{version:apiVersion}/CMS")]
+    [EnableRateLimiting("fixed")]
+    public class CMSController : BaseController
     {
         private readonly IContentService _contentService;
 
-        public CMSController(IContentService contentService)
+        public CMSController(IContentService contentService, ISender sender, IErrorHandlingService errorHandlingService)
+            : base(sender, errorHandlingService)
         {
             _contentService = contentService;
         }
@@ -55,7 +61,6 @@ namespace CMSModule.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "cms.write")]
         public async Task<IActionResult> CreateContent([FromBody] ContentDto contentDto)
         {
             var content = new Content
@@ -83,7 +88,6 @@ namespace CMSModule.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Policy = "cms.update")]
         public async Task<IActionResult> UpdateContent(string id, [FromBody] ContentDto contentDto)
         {
             var existingContentResult = await _contentService.GetContentByIdAsync(id);
@@ -119,7 +123,6 @@ namespace CMSModule.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Policy = "cms.delete")]
         public async Task<IActionResult> DeleteContent(string id)
         {
             var result = await _contentService.DeleteContentAsync(id);
@@ -132,7 +135,6 @@ namespace CMSModule.Controllers
         }
 
         [HttpPost("{id}/restore/{versionNumber}")]
-        [Authorize(Policy = "cms.update")]
         public async Task<IActionResult> RestoreContentVersion(string id, int versionNumber)
         {
             var result = await _contentService.RestoreContentVersionAsync(id, versionNumber);
