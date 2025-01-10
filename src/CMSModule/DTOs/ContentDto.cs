@@ -1,6 +1,7 @@
 ﻿using CMSModule.Models;
 
 namespace CMSModule.DTOs;
+
 public class ContentDto
 {
     public string ContentType { get; set; }
@@ -10,6 +11,7 @@ public class ContentDto
     public List<string> Tags { get; set; }
     public ContentStatus Status { get; set; }
     public string Language { get; set; }
+    public string CoverImageUrl { get; set; }
 
     // SEO Fields
     public string MetaTitle { get; set; }

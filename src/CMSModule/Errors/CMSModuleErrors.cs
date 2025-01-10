@@ -15,6 +15,11 @@ public static class CMSModuleErrors
             "Content.VersionNotFound",
             404,
             "The specified content version was not found.");
+
+        public static readonly DomainError SlugExists = new(
+            "Content.SlugExists",
+            400,
+            "The slug already exists.");
     }
 
     public static class Media

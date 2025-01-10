@@ -28,6 +28,7 @@ public class Content
     public List<ContentVersion> Versions { get; set; } = new List<ContentVersion>();
 
     public string Language { get; set; } // For localization
+    public string CoverImageUrl { get; set; }
 
     // SEO Fields
     public string MetaTitle { get; set; }
@@ -40,16 +41,9 @@ public class ContentVersion
     public int VersionNumber { get; set; }
     public string Title { get; set; }
     public string Body { get; set; }
+    public string CoverImageUrl { get; set; }
     public DateTime ModifiedAt { get; set; }
     public string ModifiedBy { get; set; }
-}
-
-public class ContentQueryParameters
-{
-    public string ContentType { get; set; }
-    public string Tag { get; set; }
-    public string Status { get; set; }
-    public string Language { get; set; }
 }
 
 public enum ContentStatus

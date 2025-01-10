@@ -1,11 +1,8 @@
 ﻿using CMSModule.Models;
+using Myrtus.Clarity.Application.Repositories.NoSQL;
 
 namespace CMSModule.Repositories.MediaRepository;
 
-public interface IMediaRepository
+public interface IMediaRepository : INoSqlRepository<Media>
 {
-    Task<Media> GetByIdAsync(string id);
-    Task<IEnumerable<Media>> GetAllAsync();
-    Task CreateAsync(Media media);
-    Task DeleteAsync(string id);
 }

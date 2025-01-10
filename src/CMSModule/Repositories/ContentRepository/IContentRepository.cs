@@ -1,14 +1,9 @@
 ﻿using CMSModule.Models;
+using Myrtus.Clarity.Application.Repositories.NoSQL;
 
 namespace CMSModule.Repositories.ContentRepository;
 
-public interface IContentRepository
+public interface IContentRepository : INoSqlRepository<Content>
 {
-    Task<Content> GetByIdAsync(string id);
-    Task<Content> GetBySlugAsync(string slug);
-    Task<IEnumerable<Content>> GetAllAsync();
-    Task<IEnumerable<Content>> QueryAsync(ContentQueryParameters parameters);
-    Task CreateAsync(Content content);
-    Task UpdateAsync(Content content);
-    Task DeleteAsync(string id);
+    Task<bool> CheckIfContentExistsBySlugAsync(string slug, CancellationToken cancellationToken);
 }

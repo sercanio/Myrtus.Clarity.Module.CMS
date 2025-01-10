@@ -13,6 +13,11 @@ using MongoDB.Bson;
 using System;
 using System.Threading.Tasks;
 using Myrtus.Clarity.Core.Domain.Abstractions;
+using Myrtus.Clarity.Core.Application.Abstractions.Authentication;
+using Myrtus.Clarity.Application.Services.Users;
+using Myrtus.Clarity.Core.Application.Abstractions.Pagination;
+using Myrtus.Clarity.Core.Infrastructure.Dynamic;
+using Myrtus.Clarity.Core.Infrastructure.Pagination;
 
 namespace CMSModule.Services.MediaService;
 
@@ -21,8 +26,10 @@ public class MediaService : IMediaService
     private readonly IMediaRepository _mediaRepository;
     private readonly BlobContainerClient _containerClient;
     private readonly IMediator _mediator;
+    private readonly IUserContext _userContext;
+    private readonly IUserService _userService;
 
-    public MediaService(IConfiguration configuration, IMediaRepository mediaRepository, IMediator mediator)
+    public MediaService(IConfiguration configuration, IMediaRepository mediaRepository, IMediator mediator, IUserContext userContext, IUserService userService)
     {
         _mediaRepository = mediaRepository;
         _mediator = mediator;
@@ -30,12 +37,27 @@ public class MediaService : IMediaService
         var connectionString = configuration["AzureBlobStorage:ConnectionString"];
         var containerName = configuration["AzureBlobStorage:ContainerName"];
 
-        var blobServiceClient = new BlobServiceClient(connectionString);
-        _containerClient = blobServiceClient.GetBlobContainerClient(containerName);
-        _containerClient.CreateIfNotExists();
+        if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(containerName))
+        {
+            throw new ArgumentException("Azure Blob Storage connection string or container name is missing.");
+        }
+
+        try
+        {
+            var blobServiceClient = new BlobServiceClient(connectionString);
+            _containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+            _containerClient.CreateIfNotExists();
+        }
+        catch (FormatException ex)
+        {
+            throw new ArgumentException("Azure Blob Storage connection string is not in the correct format.", ex);
+        }
+
+        _userContext = userContext;
+        _userService = userService;
     }
 
-    public async Task<Result<Media>> UploadMediaAsync(IFormFile file, string uploadedBy)
+    public async Task<Result<Media>> UploadMediaAsync(IFormFile file, CancellationToken cancellationToken)
     {
         if (file == null || file.Length == 0)
             return Result.Invalid();
@@ -47,7 +69,7 @@ public class MediaService : IMediaService
         {
             using (var stream = file.OpenReadStream())
             {
-                await blobClient.UploadAsync(stream, overwrite: true);
+                await blobClient.UploadAsync(stream, overwrite: true, cancellationToken);
             }
         }
         catch (Exception ex)
@@ -64,43 +86,63 @@ public class MediaService : IMediaService
             ContentType = file.ContentType,
             Size = file.Length,
             UploadedAt = DateTime.UtcNow,
-            UploadedBy = uploadedBy
+            UploadedBy = "user",
         };
 
-        await _mediaRepository.CreateAsync(media);
+        await _mediaRepository.AddAsync(media, cancellationToken);
 
         // Raise Domain Event
-        await _mediator.Publish(new MediaUploadedEvent(media.Id, media.FileName, uploadedBy));
+        await _mediator.Publish(new MediaUploadedEvent(media.Id, media.FileName, "user"));
 
         return Result.Success(media);
     }
 
-    public async Task<Result<Media>> GetMediaByIdAsync(string id)
+    public async Task<Result<Media>> GetMediaByIdAsync(string id, CancellationToken cancellationToken)
     {
-        var media = await _mediaRepository.GetByIdAsync(id);
+        var media = await _mediaRepository.GetAsync(m => m.Id == id, cancellationToken);
         if (media == null)
             return Result.NotFound(CMSModuleErrors.Media.NotFound.Name);
 
         return Result.Success(media);
     }
 
-    public async Task<Result<IEnumerable<Media>>> GetAllMediaAsync()
+    public async Task<Result<IPaginatedList<Media>>> GetAllMediaAsync(CancellationToken cancellationToken)
     {
-        var mediaList = await _mediaRepository.GetAllAsync();
+        var mediaList = await _mediaRepository.GetAllAsync(cancellationToken: cancellationToken);
         return Result.Success(mediaList);
     }
 
-    public async Task<Result> DeleteMediaAsync(string id)
+    public async Task<Result<IPaginatedList<Media>>> GetAllMediaDynamicAsync(DynamicQuery dynamicQuery, int pageIndex, int pageSize, CancellationToken cancellationToken)
     {
-        var media = await _mediaRepository.GetByIdAsync(id);
+        var mediaList = await _mediaRepository.GetAllAsync(pageIndex, pageSize, null, cancellationToken);
+        var filteredMediaList = mediaList.Items.AsQueryable().ToDynamic(dynamicQuery);
+
+        var paginatedMediaList = filteredMediaList
+            .Skip(pageIndex * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        var paginatedList = new PaginatedList<Media>(
+            paginatedMediaList,
+            filteredMediaList.Count(),
+            pageIndex,
+            pageSize
+        );
+
+        return Result.Success<IPaginatedList<Media>>(paginatedList);
+    }
+
+    public async Task<Result> DeleteMediaAsync(string id, CancellationToken cancellationToken)
+    {
+        var media = await _mediaRepository.GetAsync(m => m.Id == id, cancellationToken);
         if (media == null)
             return Result.NotFound(CMSModuleErrors.Media.NotFound.Name);
 
-        var blobClient = new BlobClient(new Uri(media.BlobUri));
+        var blobClient = _containerClient.GetBlobClient(media.Id);
 
         try
         {
-            await blobClient.DeleteIfExistsAsync();
+            await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {
@@ -108,17 +150,17 @@ public class MediaService : IMediaService
             return Result.Error(new DomainError("Media.DeleteFailed", 500, ex.Message).Name);
         }
 
-        await _mediaRepository.DeleteAsync(id);
+        await _mediaRepository.DeleteAsync(m => m.Id == id, cancellationToken);
 
         // Raise Domain Event
-        await _mediator.Publish(new MediaDeletedEvent(id, media.FileName, "system")); // Replace "system" with actual user
+        await _mediator.Publish(new MediaDeletedEvent(id, media.FileName, "system"), cancellationToken); // Replace "system" with actual user
 
         return Result.Success();
     }
 
-    public async Task<Result<string>> GetMediaUrlAsync(string id)
+    public async Task<Result<string>> GetMediaUrlAsync(string id, CancellationToken cancellationToken)
     {
-        var media = await _mediaRepository.GetByIdAsync(id);
+        var media = await _mediaRepository.GetAsync(m => m.Id == id, cancellationToken);
         if (media == null)
             return Result.NotFound(CMSModuleErrors.Media.NotFound.Name);
 

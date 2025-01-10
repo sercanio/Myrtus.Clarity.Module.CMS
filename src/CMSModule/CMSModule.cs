@@ -28,7 +28,8 @@ public class CMSModule : IClarityModule
         services.AddScoped<IMongoDatabase>(sp =>
         {
             var client = sp.GetRequiredService<IMongoClient>();
-            return client.GetDatabase("YourDatabaseName"); // Replace with your DB name
+            var databaseName = configuration.GetValue<string>("MongoDB:Database");
+            return client.GetDatabase(databaseName);
         });
 
         // Register Repositories

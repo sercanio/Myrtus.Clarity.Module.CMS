@@ -5,6 +5,11 @@ using CMSModule.Models;
 using CMSModule.Repositories.ContentRepository;
 using MediatR;
 using MongoDB.Bson;
+using Myrtus.Clarity.Application.Services.Users;
+using Myrtus.Clarity.Core.Application.Abstractions.Authentication;
+using Myrtus.Clarity.Core.Application.Abstractions.Pagination;
+using Myrtus.Clarity.Core.Infrastructure.Dynamic;
+using Myrtus.Clarity.Core.Infrastructure.Pagination;
 
 namespace CMSModule.Services.ContentService;
 
@@ -12,16 +17,31 @@ public class ContentService : IContentService
 {
     private readonly IContentRepository _contentRepository;
     private readonly IMediator _mediator;
+    private readonly IUserContext _userContext;
+    private readonly IUserService _userService;
 
-    public ContentService(IContentRepository contentRepository, IMediator mediator)
+    public ContentService(
+        IContentRepository contentRepository,
+        IMediator mediator,
+        IUserContext userContext,
+        IUserService userService)
     {
         _contentRepository = contentRepository;
         _mediator = mediator;
+        _userContext = userContext;
+        _userService = userService;
     }
 
-    public async Task<Result<Content>> GetContentByIdAsync(string id)
+    public async Task<Result<bool>> CheckIfContentExistsBySlugAsync(string slug, CancellationToken cancellationToken)
     {
-        var content = await _contentRepository.GetByIdAsync(id);
+        bool check = await _contentRepository.CheckIfContentExistsBySlugAsync(slug, cancellationToken);
+
+        return Result.Success<bool>(check);
+    }
+
+    public async Task<Result<Content>> GetContentByIdAsync(string id, CancellationToken cancellationToken)
+    {
+        var content = await _contentRepository.GetAsync(c => c.Id == id, cancellationToken);
         if (content == null)
         {
             return Result.NotFound(CMSModuleErrors.Content.NotFound.Name);
@@ -30,9 +50,9 @@ public class ContentService : IContentService
         return Result.Success(content);
     }
 
-    public async Task<Result<Content>> GetContentBySlugAsync(string slug)
+    public async Task<Result<Content>> GetContentBySlugAsync(string slug, CancellationToken cancellationToken)
     {
-        var content = await _contentRepository.GetBySlugAsync(slug);
+        var content = await _contentRepository.GetAsync(c => c.Slug == slug, cancellationToken);
         if (content == null)
         {
             return Result.NotFound(CMSModuleErrors.Content.NotFound.Name);
@@ -41,57 +61,77 @@ public class ContentService : IContentService
         return Result.Success(content);
     }
 
-    public async Task<Result<IEnumerable<Content>>> GetAllContentsAsync()
+    public async Task<Result<IPaginatedList<Content>>> GetAllContentsAsync(int pageIndex, int pageSize, CancellationToken cancellationToken)
     {
-        var contents = await _contentRepository.GetAllAsync();
+        var contents = await _contentRepository.GetAllAsync(pageIndex, pageSize, null, cancellationToken);
         return Result.Success(contents);
     }
 
-    public async Task<Result<IEnumerable<Content>>> QueryContentsAsync(ContentQueryParameters parameters)
+    public async Task<Result<IPaginatedList<Content>>> GetAllContentsDynamicAsync(DynamicQuery dynamicQuery, int pageIndex, int pageSize, CancellationToken cancellationToken)
     {
-        var contents = await _contentRepository.QueryAsync(parameters);
-        return Result.Success(contents);
+        var contents = await _contentRepository.GetAllAsync(pageIndex, pageSize, null, cancellationToken);
+        var filteredContents = contents.Items.AsQueryable().ToDynamic(dynamicQuery);
+
+        var paginatedContents = filteredContents
+            .Skip(pageIndex * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        var paginatedList = new PaginatedList<Content>(
+            paginatedContents,
+            filteredContents.Count(),
+            pageIndex,
+            pageSize
+        );
+
+        return Result.Success<IPaginatedList<Content>>(paginatedList);
     }
 
-    public async Task<Result<Content>> CreateContentAsync(Content content, string createdBy)
+    public async Task<Result<Content>> CreateContentAsync(Content content, string createdBy, CancellationToken cancellationToken)
     {
+        var slugExists = await CheckIfContentExistsBySlugAsync(content.Slug, cancellationToken);
+        if (slugExists.Value)
+        {
+            return Result.Conflict(CMSModuleErrors.Content.SlugExists.Name);
+        }
+
         content.Id = ObjectId.GenerateNewId().ToString();
         content.CreatedAt = DateTime.UtcNow;
         content.UpdatedAt = DateTime.UtcNow;
         content.Versions = new List<ContentVersion>
+        {
+            new ContentVersion
             {
-                new ContentVersion
-                {
-                    VersionNumber = 1,
-                    Title = content.Title,
-                    Body = content.Body,
-                    ModifiedAt = content.CreatedAt,
-                    ModifiedBy = createdBy
-                }
-            };
+                VersionNumber = 1,
+                Title = content.Title,
+                Body = content.Body,
+                CoverImageUrl = content.CoverImageUrl,
+                ModifiedAt = content.CreatedAt,
+                ModifiedBy = createdBy
+            }
+        };
 
-        await _contentRepository.CreateAsync(content);
+        await _contentRepository.AddAsync(content, cancellationToken);
 
-        // Raise Domain Event
         await _mediator.Publish(new ContentCreatedEvent(content.Id, content.Title, createdBy));
 
         return Result.Success(content);
     }
 
-    public async Task<Result> UpdateContentAsync(Content content, string modifiedBy)
+    public async Task<Result> UpdateContentAsync(Content content, string modifiedBy, CancellationToken cancellationToken)
     {
-        var existingContent = await _contentRepository.GetByIdAsync(content.Id);
+        var existingContent = await _contentRepository.GetAsync(c => c.Id == content.Id, cancellationToken);
         if (existingContent == null)
         {
             return Result.NotFound(CMSModuleErrors.Content.NotFound.Name);
         }
 
-        // Add new version
         var newVersion = new ContentVersion
         {
             VersionNumber = existingContent.Versions.Count + 1,
             Title = content.Title,
             Body = content.Body,
+            CoverImageUrl = content.CoverImageUrl,
             ModifiedAt = DateTime.UtcNow,
             ModifiedBy = modifiedBy
         };
@@ -100,39 +140,38 @@ public class ContentService : IContentService
 
         content.UpdatedAt = DateTime.UtcNow;
 
-        await _contentRepository.UpdateAsync(content);
+        await _contentRepository.UpdateAsync(content, cancellationToken);
 
-        // Check for status change to Published
         if (existingContent.Status != content.Status && content.Status == ContentStatus.Published)
         {
             await _mediator.Publish(new ContentPublishedEvent(content.Id, content.Title, modifiedBy));
         }
 
-        // Raise Domain Event for Update
         await _mediator.Publish(new ContentUpdatedEvent(content.Id, content.Title, modifiedBy));
 
         return Result.Success();
     }
 
-    public async Task<Result> DeleteContentAsync(string id)
+    public async Task<Result> DeleteContentAsync(string id, CancellationToken cancellationToken)
     {
-        var existingContent = await _contentRepository.GetByIdAsync(id);
+        var existingContent = await _contentRepository.GetAsync(c => c.Id == id, cancellationToken);
         if (existingContent == null)
         {
             return Result.NotFound(CMSModuleErrors.Content.NotFound.Name);
         }
 
-        await _contentRepository.DeleteAsync(id);
+        await _contentRepository.DeleteAsync(c => c.Id == id, cancellationToken);
 
-        // Raise Domain Event
         await _mediator.Publish(new ContentDeletedEvent(id, existingContent.Title, "system")); // Replace "system" with actual user
 
         return Result.Success();
     }
 
-    public async Task<Result> RestoreContentVersionAsync(string id, int versionNumber)
+    public async Task<Result> RestoreContentVersionAsync(string id, int versionNumber, CancellationToken cancellationToken)
     {
-        var content = await _contentRepository.GetByIdAsync(id);
+        const int MaxVersions = 10;
+
+        var content = await _contentRepository.GetAsync(c => c.Id == id, cancellationToken);
         if (content == null)
         {
             return Result.NotFound(CMSModuleErrors.Content.NotFound.Name);
@@ -144,26 +183,34 @@ public class ContentService : IContentService
             return Result.NotFound(CMSModuleErrors.Content.VersionNotFound.Name);
         }
 
+        content.Versions.Remove(version);
+        content.Versions.Add(version);
+
+        for (int i = 0; i < content.Versions.Count; i++)
+        {
+            content.Versions[i].VersionNumber = i + 1;
+        }
+
         content.Title = version.Title;
         content.Body = version.Body;
-        content.Status = ContentStatus.Draft; // Or set as per your workflow
+        content.CoverImageUrl = version.CoverImageUrl;
+        content.Status = ContentStatus.Draft;
         content.UpdatedAt = DateTime.UtcNow;
 
-        // Add a new version entry
-        var newVersion = new ContentVersion
+        var user = await _userService.GetUserByIdAsync(_userContext.UserId, cancellationToken);
+
+        if (content.Versions.Count > MaxVersions)
         {
-            VersionNumber = content.Versions.Count + 1,
-            Title = content.Title,
-            Body = content.Body,
-            ModifiedAt = content.UpdatedAt,
-            ModifiedBy = "system" // Replace with actual user
-        };
-        content.Versions.Add(newVersion);
+            content.Versions = content.Versions
+                .OrderByDescending(v => v.VersionNumber)
+                .Take(MaxVersions)
+                .OrderBy(v => v.VersionNumber)
+                .ToList();
+        }
 
-        await _contentRepository.UpdateAsync(content);
+        await _contentRepository.UpdateAsync(content, cancellationToken);
 
-        // Raise Domain Event
-        await _mediator.Publish(new ContentRestoredEvent(id, content.Title, "system")); // Replace "system" with actual user
+        await _mediator.Publish(new ContentRestoredEvent(id, content.Title, user.Id.ToString()));
 
         return Result.Success();
     }
