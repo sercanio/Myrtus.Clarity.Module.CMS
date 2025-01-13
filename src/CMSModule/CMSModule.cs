@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Myrtus.Clarity.Core.Application.Abstractions.Module;
 using CMSModule.Repositories.ContentRepository;
 using CMSModule.Repositories.MediaRepository;
-using CMSModule.Repositories.SEORepository;
+using CMSModule.Repositories.SeoRepository;
 using CMSModule.Services.ContentService;
 using CMSModule.Services.MediaService;
 using CMSModule.Services.SEOService;
@@ -37,7 +37,7 @@ public class CMSModule : IClarityModule
         // Register Repositories
         services.AddScoped<IContentRepository, ContentRepository>();
         services.AddScoped<IMediaRepository, MediaRepository>();
-        services.AddScoped<ISEORepository, SEORepository>();
+        services.AddScoped<ISeoRepository, SeoRepository>();
 
         // Register Services
         services.AddScoped<IContentService, ContentService>();

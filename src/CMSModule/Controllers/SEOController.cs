@@ -8,7 +8,6 @@ using Myrtus.Clarity.Core.Infrastructure.Authorization;
 using Myrtus.Clarity.Core.WebAPI;
 using Myrtus.Clarity.Core.WebAPI.Controllers;
 
-
 namespace CMSModule.Controllers;
 
 [ApiController]
@@ -26,18 +25,18 @@ public partial class SEOController : BaseController
 
     [HttpGet]
     [HasPermission(Attributes.CMSPermissions.SEORead)]
-    public async Task<ActionResult<SEOSettings>> GetSEOSettings()
+    public async Task<ActionResult<SEOSettings>> GetSEOSettings(CancellationToken cancellationToken)
     {
-        var settings = await _seoService.GetSEOSettingsAsync();
+        var settings = await _seoService.GetSEOSettingsAsync(cancellationToken);
         if (settings == null)
             return NotFound();
 
         return Ok(settings);
     }
 
-    [HttpPost]
+    [HttpPut]
     [HasPermission(Attributes.CMSPermissions.SEOCreate)]
-    public async Task<ActionResult> SaveSEOSettings([FromBody] SEOSettingsDto seoDto)
+    public async Task<ActionResult> SaveSEOSettings([FromBody] SEOSettingsDto seoDto, CancellationToken cancellationToken)
     {
         var settings = new SEOSettings
         {
@@ -46,7 +45,7 @@ public partial class SEOController : BaseController
             DefaultMetaKeywords = seoDto.DefaultMetaKeywords
         };
 
-        await _seoService.SaveSEOSettingsAsync(settings);
+        await _seoService.SaveSEOSettingsAsync(settings, cancellationToken);
 
         return NoContent();
     }

@@ -1,9 +1,8 @@
 ﻿using CMSModule.Models;
+using Myrtus.Clarity.Application.Repositories.NoSQL;
 
-namespace CMSModule.Repositories.SEORepository;
+namespace CMSModule.Repositories.SeoRepository;
 
-public interface ISEORepository
+public interface ISeoRepository: INoSqlRepository<SEOSettings>
 {
-    Task<SEOSettings> GetSEOSettingsAsync();
-    Task SaveSEOSettingsAsync(SEOSettings settings);
 }

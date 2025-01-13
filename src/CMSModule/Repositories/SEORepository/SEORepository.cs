@@ -1,33 +1,13 @@
 ﻿using CMSModule.Models;
 using MongoDB.Driver;
+using Myrtus.Clarity.Infrastructure.Repositories.NoSQL;
 
-namespace CMSModule.Repositories.SEORepository;
+namespace CMSModule.Repositories.SeoRepository;
 
-public class SEORepository : ISEORepository
+public class SeoRepository : NoSqlRepository<SEOSettings>, ISeoRepository
 {
-    private readonly IMongoCollection<SEOSettings> _seoSettings;
-
-    public SEORepository(IMongoDatabase database)
+    public SeoRepository(IMongoDatabase database)
+        : base(database, "SEO")
     {
-        _seoSettings = database.GetCollection<SEOSettings>("SEOSettings");
-    }
-
-    public async Task<SEOSettings> GetSEOSettingsAsync()
-    {
-        return await _seoSettings.Find(_ => true).FirstOrDefaultAsync();
-    }
-
-    public async Task SaveSEOSettingsAsync(SEOSettings settings)
-    {
-        var existing = await _seoSettings.Find(_ => true).FirstOrDefaultAsync();
-        if (existing == null)
-        {
-            await _seoSettings.InsertOneAsync(settings);
-        }
-        else
-        {
-            settings.Id = existing.Id; // Ensure the same ID
-            await _seoSettings.ReplaceOneAsync(s => s.Id == settings.Id, settings);
-        }
     }
 }

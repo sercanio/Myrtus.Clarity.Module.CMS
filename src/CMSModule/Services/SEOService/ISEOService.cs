@@ -1,9 +1,12 @@
-﻿using CMSModule.Models;
+﻿using Ardalis.Result;
+using CMSModule.Models;
 
-namespace CMSModule.Services.SEOService;
-
-public interface ISEOService
+namespace CMSModule.Services.SEOService
 {
-    Task<SEOSettings> GetSEOSettingsAsync();
-    Task SaveSEOSettingsAsync(SEOSettings settings);
+    public interface ISEOService
+    {
+
+        Task<Result<SEOSettings>> GetSEOSettingsAsync(CancellationToken cancellationToken);
+        Task<Result> SaveSEOSettingsAsync(SEOSettings settings, CancellationToken cancellationToken);
+    }
 }

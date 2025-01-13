@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Myrtus.Clarity.Core.Domain.Abstractions;
 
 namespace CMSModule.Models;
 
