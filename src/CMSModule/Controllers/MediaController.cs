@@ -1,13 +1,10 @@
-﻿using Ardalis.Result;
-using CMSModule.Controllers.DTOs;
+﻿using CMSModule.Controllers.DTOs;
 using CMSModule.DTOs;
-using CMSModule.Models;
 using CMSModule.Services.MediaService;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Myrtus.Clarity.Core.Infrastructure.Authorization;
 using Myrtus.Clarity.Core.Infrastructure.Dynamic;
 using Myrtus.Clarity.Core.WebAPI;
 using Myrtus.Clarity.Core.WebAPI.Controllers;
@@ -29,6 +26,7 @@ public class MediaController : BaseController
     }
 
     [HttpGet("{id}")]
+    [HasPermission(Attributes.CMSPermissions.MediaRead)]
     public async Task<ActionResult<string>> GetMediaUrl(string id, CancellationToken cancellationToken)
     {
         var url = await _mediaService.GetMediaUrlAsync(id, cancellationToken);
@@ -36,6 +34,7 @@ public class MediaController : BaseController
     }
 
     [HttpGet]
+    [HasPermission(Attributes.CMSPermissions.MediaRead)]
     public async Task<IActionResult> GetAllMedia(CancellationToken cancellationToken)
     {
         var result = await _mediaService.GetAllMediaAsync(cancellationToken);
@@ -43,6 +42,7 @@ public class MediaController : BaseController
     }
 
     [HttpPost("dynamic")]
+    [HasPermission(Attributes.CMSPermissions.MediaRead)]
     public async Task<IActionResult> GetAllMediaDynamic([FromBody] DynamicQuery dynamicQuery, [FromQuery] int pageIndex = 0, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
         var result = await _mediaService.GetAllMediaDynamicAsync(dynamicQuery, pageIndex, pageSize, cancellationToken);
@@ -56,6 +56,7 @@ public class MediaController : BaseController
     /// <returns>A response indicating the success of the upload.</returns>
     [HttpPost("upload")]
     [Consumes("multipart/form-data")]
+    [HasPermission(Attributes.CMSPermissions.MediaCreate)]
     public async Task<IActionResult> UploadMedia([FromForm] UploadMediaRequest request, CancellationToken cancellationToken)
     {
         if (request.File == null || request.File.Length == 0)
@@ -83,6 +84,7 @@ public class MediaController : BaseController
     }
 
     [HttpDelete("{id}")]
+    [HasPermission(Attributes.CMSPermissions.MediaDelete)]
     public async Task<IActionResult> DeleteMedia(string id, CancellationToken cancellationToken)
     {
         var result = await _mediaService.DeleteMediaAsync(id, cancellationToken);
