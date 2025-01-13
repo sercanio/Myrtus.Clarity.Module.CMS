@@ -2,12 +2,14 @@
 using CMSModule.Models;
 using CMSModule.Services.SEOService;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Myrtus.Clarity.Core.Infrastructure.Authorization;
 using Myrtus.Clarity.Core.WebAPI;
 using Myrtus.Clarity.Core.WebAPI.Controllers;
-using NSwag.Annotations;
+
+
+namespace CMSModule.Controllers;
 
 [ApiController]
 [ApiVersion("1")]
@@ -23,7 +25,7 @@ public partial class SEOController : BaseController
     }
 
     [HttpGet]
-    [OpenApiOperation("GetSEOSettings", "Retrieves the SEO settings.")]
+    [HasPermission(Attributes.CMSPermissions.SEORead)]
     public async Task<ActionResult<SEOSettings>> GetSEOSettings()
     {
         var settings = await _seoService.GetSEOSettingsAsync();
@@ -34,6 +36,7 @@ public partial class SEOController : BaseController
     }
 
     [HttpPost]
+    [HasPermission(Attributes.CMSPermissions.SEOCreate)]
     public async Task<ActionResult> SaveSEOSettings([FromBody] SEOSettingsDto seoDto)
     {
         var settings = new SEOSettings
