@@ -113,7 +113,7 @@ public class ContentService : IContentService
 
         await _contentRepository.AddAsync(content, cancellationToken);
 
-        await _mediator.Publish(new ContentCreatedEvent(content.Id, content.Title, createdBy));
+        await _mediator.Publish(new ContentCreatedEvent(content.Id, content.Title, createdBy), cancellationToken);
 
         return Result.Success(content);
     }
