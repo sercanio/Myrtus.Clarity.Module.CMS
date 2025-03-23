@@ -1,4 +1,4 @@
-﻿using Ardalis.Result;
+using Ardalis.Result;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
@@ -14,7 +14,7 @@ using System;
 using System.Threading.Tasks;
 using Myrtus.Clarity.Core.Domain.Abstractions;
 using Myrtus.Clarity.Core.Application.Abstractions.Authentication;
-using Myrtus.Clarity.Application.Services.AppUsers;
+using AppTemplate.Application.Services.AppUsers;
 using Myrtus.Clarity.Core.Application.Abstractions.Pagination;
 using Myrtus.Clarity.Core.Infrastructure.Dynamic;
 using Myrtus.Clarity.Core.Infrastructure.Pagination;
@@ -27,9 +27,9 @@ public class MediaService : IMediaService
     private readonly BlobContainerClient _containerClient;
     private readonly IMediator _mediator;
     private readonly IUserContext _userContext;
-    private readonly IAppUserService _userService;
+    private readonly IAppUsersService _userService;
 
-    public MediaService(IConfiguration configuration, IMediaRepository mediaRepository, IMediator mediator, IUserContext userContext, IAppUserService userService)
+    public MediaService(IConfiguration configuration, IMediaRepository mediaRepository, IMediator mediator, IUserContext userContext, IAppUsersService userService)
     {
         _mediaRepository = mediaRepository;
         _mediator = mediator;

@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Myrtus.Clarity.Core.Application.Abstractions.Auditing;
 using Myrtus.Clarity.Core.Domain.Abstractions;
 

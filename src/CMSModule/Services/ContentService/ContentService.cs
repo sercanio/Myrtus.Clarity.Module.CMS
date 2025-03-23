@@ -1,15 +1,15 @@
-﻿using Ardalis.Result;
+using Ardalis.Result;
 using CMSModule.Errors;
 using CMSModule.Events;
 using CMSModule.Models;
 using CMSModule.Repositories.ContentRepository;
 using MediatR;
 using MongoDB.Bson;
-using Myrtus.Clarity.Application.Services.AppUsers;
 using Myrtus.Clarity.Core.Application.Abstractions.Authentication;
 using Myrtus.Clarity.Core.Application.Abstractions.Pagination;
 using Myrtus.Clarity.Core.Infrastructure.Dynamic;
 using Myrtus.Clarity.Core.Infrastructure.Pagination;
+using AppTemplate.Application.Services.AppUsers;
 
 namespace CMSModule.Services.ContentService;
 
@@ -18,13 +18,13 @@ public class ContentService : IContentService
     private readonly IContentRepository _contentRepository;
     private readonly IMediator _mediator;
     private readonly IUserContext _userContext;
-    private readonly IAppUserService _userService;
+    private readonly IAppUsersService _userService;
 
     public ContentService(
         IContentRepository contentRepository,
         IMediator mediator,
         IUserContext userContext,
-        IAppUserService userService)
+        IAppUsersService userService)
     {
         _contentRepository = contentRepository;
         _mediator = mediator;

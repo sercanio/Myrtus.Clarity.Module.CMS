@@ -1,4 +1,4 @@
-﻿using Ardalis.Result;
+using Ardalis.Result;
 using CMSModule.Models;
 
 namespace CMSModule.Services.SEOService

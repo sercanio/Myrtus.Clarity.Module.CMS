@@ -1,4 +1,3 @@
-﻿using Microsoft.Graph.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Myrtus.Clarity.Core.Domain.Abstractions;

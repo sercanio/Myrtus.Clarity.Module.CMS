@@ -1,4 +1,4 @@
-﻿using CMSModule.DTOs;
+using CMSModule.DTOs;
 using FluentValidation;
 
 namespace CMSModule.Validators;

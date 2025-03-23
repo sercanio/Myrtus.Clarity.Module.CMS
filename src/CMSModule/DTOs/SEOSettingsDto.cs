@@ -1,4 +1,4 @@
-﻿namespace CMSModule.DTOs;
+namespace CMSModule.DTOs;
 
 public class SEOSettingsDto
 {

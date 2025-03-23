@@ -1,4 +1,4 @@
-﻿// modules/cms/src/Events/Handlers/MediaDeletedEventHandler.cs
+// modules/cms/src/Events/Handlers/MediaDeletedEventHandler.cs
 using MediatR;
 using Myrtus.Clarity.Core.Application.Abstractions.Auditing;
 using Myrtus.Clarity.Core.Domain.Abstractions;
