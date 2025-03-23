@@ -11,8 +11,8 @@ using CMSModule.Services.SEOService;
 using MongoDB.Driver;
 using System.Reflection;
 using FluentValidation.AspNetCore;
-using Myrtus.Clarity.Infrastructure;
-using Myrtus.Clarity.Domain.Roles;
+using EcoFind.Infrastructure;
+using EcoFind.Domain.Roles;
 
 namespace CMSModule;
 
