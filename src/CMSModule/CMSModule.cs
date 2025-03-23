@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Builder;
+using MongoDB.Driver;
+using FluentValidation.AspNetCore;
 using Myrtus.Clarity.Core.Application.Abstractions.Module;
 using CMSModule.Repositories.ContentRepository;
 using CMSModule.Repositories.MediaRepository;
@@ -8,11 +11,8 @@ using CMSModule.Repositories.SeoRepository;
 using CMSModule.Services.ContentService;
 using CMSModule.Services.MediaService;
 using CMSModule.Services.SEOService;
-using MongoDB.Driver;
-using System.Reflection;
-using FluentValidation.AspNetCore;
-using EcoFind.Infrastructure;
-using EcoFind.Domain.Roles;
+using AppTemplate.Infrastructure;
+using AppTemplate.Domain.Roles;
 
 namespace CMSModule;
 

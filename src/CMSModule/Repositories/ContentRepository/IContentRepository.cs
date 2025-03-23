@@ -1,5 +1,5 @@
 ﻿using CMSModule.Models;
-using Myrtus.Clarity.Application.Repositories.NoSQL;
+using AppTemplate.Application.Repositories.NoSQL;
 
 namespace CMSModule.Repositories.ContentRepository;
 

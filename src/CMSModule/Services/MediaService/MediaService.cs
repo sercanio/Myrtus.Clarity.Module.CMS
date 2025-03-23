@@ -14,7 +14,7 @@ using System;
 using System.Threading.Tasks;
 using Myrtus.Clarity.Core.Domain.Abstractions;
 using Myrtus.Clarity.Core.Application.Abstractions.Authentication;
-using Myrtus.Clarity.Application.Services.Users;
+using Myrtus.Clarity.Application.Services.AppUsers;
 using Myrtus.Clarity.Core.Application.Abstractions.Pagination;
 using Myrtus.Clarity.Core.Infrastructure.Dynamic;
 using Myrtus.Clarity.Core.Infrastructure.Pagination;
@@ -27,9 +27,9 @@ public class MediaService : IMediaService
     private readonly BlobContainerClient _containerClient;
     private readonly IMediator _mediator;
     private readonly IUserContext _userContext;
-    private readonly IUserService _userService;
+    private readonly IAppUserService _userService;
 
-    public MediaService(IConfiguration configuration, IMediaRepository mediaRepository, IMediator mediator, IUserContext userContext, IUserService userService)
+    public MediaService(IConfiguration configuration, IMediaRepository mediaRepository, IMediator mediator, IUserContext userContext, IAppUserService userService)
     {
         _mediaRepository = mediaRepository;
         _mediator = mediator;

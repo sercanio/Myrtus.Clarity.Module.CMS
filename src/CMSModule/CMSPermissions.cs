@@ -1,4 +1,4 @@
-﻿using Myrtus.Clarity.Domain.Roles;
+﻿using AppTemplate.Domain.Roles;
 
 namespace CMSModule
 {

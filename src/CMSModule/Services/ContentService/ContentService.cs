@@ -5,7 +5,7 @@ using CMSModule.Models;
 using CMSModule.Repositories.ContentRepository;
 using MediatR;
 using MongoDB.Bson;
-using Myrtus.Clarity.Application.Services.Users;
+using Myrtus.Clarity.Application.Services.AppUsers;
 using Myrtus.Clarity.Core.Application.Abstractions.Authentication;
 using Myrtus.Clarity.Core.Application.Abstractions.Pagination;
 using Myrtus.Clarity.Core.Infrastructure.Dynamic;
@@ -18,13 +18,13 @@ public class ContentService : IContentService
     private readonly IContentRepository _contentRepository;
     private readonly IMediator _mediator;
     private readonly IUserContext _userContext;
-    private readonly IUserService _userService;
+    private readonly IAppUserService _userService;
 
     public ContentService(
         IContentRepository contentRepository,
         IMediator mediator,
         IUserContext userContext,
-        IUserService userService)
+        IAppUserService userService)
     {
         _contentRepository = contentRepository;
         _mediator = mediator;
