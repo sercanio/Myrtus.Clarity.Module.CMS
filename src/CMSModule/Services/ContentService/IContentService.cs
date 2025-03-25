@@ -1,4 +1,4 @@
-﻿using Ardalis.Result;
+using Ardalis.Result;
 using CMSModule.Models;
 using Myrtus.Clarity.Core.Application.Abstractions.Pagination;
 using Myrtus.Clarity.Core.Infrastructure.Dynamic;

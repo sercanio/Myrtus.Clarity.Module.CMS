@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Myrtus.Clarity.Core.Application.Abstractions.Notification;
 
 namespace CMSModule.Events.Handlers

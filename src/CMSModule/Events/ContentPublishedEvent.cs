@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Myrtus.Clarity.Core.Application.Abstractions.Clock;
 using Myrtus.Clarity.Core.Infrastructure.Clock;
 

@@ -1,4 +1,4 @@
-﻿using Ardalis.Result;
+using Ardalis.Result;
 using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Sas;

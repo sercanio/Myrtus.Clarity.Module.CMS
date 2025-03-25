@@ -1,4 +1,4 @@
-﻿using Ardalis.Result;
+using Ardalis.Result;
 using CMSModule.Errors;
 using CMSModule.Events;
 using CMSModule.Models;

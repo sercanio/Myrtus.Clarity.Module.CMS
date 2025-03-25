@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+using MongoDB.Bson;
+
 using MongoDB.Bson.Serialization.Attributes;
 using Myrtus.Clarity.Core.Domain.Abstractions;
 using Entity = Myrtus.Clarity.Core.Domain.Abstractions.Entity;

@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using global::CMSModule.DTOs;
 
 namespace CMSModule.Validators;

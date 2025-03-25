@@ -1,4 +1,4 @@
-﻿// modules/cms/src/Events/Handlers/ContentDeletedEventHandler.cs
+// modules/cms/src/Events/Handlers/ContentDeletedEventHandler.cs
 using System.Threading;
 using System.Threading.Tasks;
 using CMSModule.Events;

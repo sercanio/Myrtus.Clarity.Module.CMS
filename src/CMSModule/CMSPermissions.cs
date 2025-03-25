@@ -1,4 +1,4 @@
-﻿using AppTemplate.Domain.Roles;
+using AppTemplate.Domain.Roles;
 
 namespace CMSModule
 {

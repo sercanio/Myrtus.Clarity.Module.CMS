@@ -1,4 +1,4 @@
-﻿namespace CMSModule.Attributes
+namespace CMSModule.Attributes
 {
     internal static class CMSPermissions
     {

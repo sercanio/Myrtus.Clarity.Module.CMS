@@ -1,4 +1,4 @@
-﻿// modules/cms/src/Events/ContentCreatedEvent.cs
+// modules/cms/src/Events/ContentCreatedEvent.cs
 using MediatR;
 
 namespace CMSModule.Events;
