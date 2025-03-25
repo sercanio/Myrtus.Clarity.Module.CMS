@@ -7,17 +7,17 @@ using CMSModule.Errors;
 using CMSModule.Models;
 using CMSModule.Repositories.MediaRepository;
 using MediatR;
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
-using System;
-using System.Threading.Tasks;
 using Myrtus.Clarity.Core.Domain.Abstractions;
 using Myrtus.Clarity.Core.Application.Abstractions.Authentication;
-using Myrtus.Clarity.Application.Services.Users;
 using Myrtus.Clarity.Core.Application.Abstractions.Pagination;
 using Myrtus.Clarity.Core.Infrastructure.Dynamic;
 using Myrtus.Clarity.Core.Infrastructure.Pagination;
+using AppTemplate.Application.Services.AppUsers;
 
 namespace CMSModule.Services.MediaService;
 
@@ -27,9 +27,14 @@ public class MediaService : IMediaService
     private readonly BlobContainerClient _containerClient;
     private readonly IMediator _mediator;
     private readonly IUserContext _userContext;
-    private readonly IUserService _userService;
+    private readonly IAppUsersService _userService;
 
-    public MediaService(IConfiguration configuration, IMediaRepository mediaRepository, IMediator mediator, IUserContext userContext, IUserService userService)
+    public MediaService(
+        IConfiguration configuration, 
+        IMediaRepository mediaRepository, 
+        IMediator mediator, 
+        IUserContext userContext,
+        IAppUsersService userService)
     {
         _mediaRepository = mediaRepository;
         _mediator = mediator;

@@ -1,6 +1,6 @@
 ﻿using CMSModule.Models;
 using MongoDB.Driver;
-using Myrtus.Clarity.Infrastructure.Repositories.NoSQL;
+using AppTemplate.Infrastructure.Repositories.NoSQL;
 
 namespace CMSModule.Repositories.MediaRepository;
 

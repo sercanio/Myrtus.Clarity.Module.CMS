@@ -15,8 +15,10 @@
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
 		<PackageReference Include="MediatR" Version="12.4.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
 		<PackageReference Include="MongoDB.Driver" Version="3.1.0" />
+		<PackageReference Include="MongoDB.Bson" Version="3.1.0" />
+
 		<!-- Updated -->
 		
         <!-- Direct references to resolve downgrades -->
@@ -34,8 +36,8 @@
 		<ProjectReference Include="..\..\..\..\core\Myrtus.Clarity.Core.Application.Abstractions.Module\Myrtus.Clarity.Core.Application.Abstractions.Module.csproj" />
 		<ProjectReference Include="..\..\..\..\core\Myrtus.Clarity.Core.Application.Abstractions.Notification\Myrtus.Clarity.Core.Application.Abstractions.Notification.csproj" />
 		<ProjectReference Include="..\..\..\..\core\Myrtus.Clarity.Core.WebApi\Myrtus.Clarity.Core.WebApi.csproj" />
-		<ProjectReference Include="..\..\..\..\src\Myrtus.Clarity.Application\Myrtus.Clarity.Application.csproj" />
-		<ProjectReference Include="..\..\..\..\src\Myrtus.Clarity.Infrastructure\Myrtus.Clarity.Infrastructure.csproj" />
+		<ProjectReference Include="..\..\..\..\src\AppTemplate.Application\AppTemplate.Application.csproj" />
+		<ProjectReference Include="..\..\..\..\src\AppTemplate.Infrastructure\AppTemplate.Infrastructure.csproj" />
 	</ItemGroup>
 
 </Project>

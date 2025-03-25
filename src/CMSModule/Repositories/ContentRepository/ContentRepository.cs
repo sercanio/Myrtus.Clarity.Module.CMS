@@ -1,7 +1,7 @@
 ﻿using CMSModule.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Myrtus.Clarity.Infrastructure.Repositories.NoSQL;
+using AppTemplate.Infrastructure.Repositories.NoSQL;
 
 namespace CMSModule.Repositories.ContentRepository;
 
